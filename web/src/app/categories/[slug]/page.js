@@ -1,14 +1,12 @@
 // web/src/app/categories/[slug]/page.js
 
-import { client, urlFor } from '@/sanity/client'; // urlFor not directly used here, but ArticleCard might use it.
+import { client, urlFor } from '@/sanity/client';
 import Link from 'next/link';
-// import Image from 'next/image'; // Not directly used in this file, ArticleCard handles its own Image import
 import ArticleCard from '@/components/ArticleCard';
 import { notFound } from 'next/navigation';
 
 const ARTICLES_PER_PAGE = 15;
 
-// --- 1. Function to fetch category details and its paginated articles ---
 async function getCategoryData(slug, page = 1) {
   const startIndex = (page - 1) * ARTICLES_PER_PAGE;
   const endIndex = startIndex + ARTICLES_PER_PAGE;
@@ -35,26 +33,15 @@ async function getCategoryData(slug, page = 1) {
 
   const totalArticlesInCategoryQuery = `count(*[_type == "article" && references(*[_type=="category" && slug.current == $slug]._id)])`;
   
-  try {
-    const [category, articlesData, totalArticlesData] = await Promise.all([
-      client.fetch(categoryQuery, { slug }),
-      client.fetch(articlesQuery, { slug }),
-      client.fetch(totalArticlesInCategoryQuery, { slug })
-    ]);
-    
-    return { 
-      category, 
-      articles: articlesData || [], 
-      totalArticles: totalArticlesData || 0 
-    };
-  } catch (error) {
-    console.error(`Error fetching data for category slug "${slug}":`, error);
-    return { category: null, articles: [], totalArticles: 0 };
-  }
+  const [category, articles, totalArticles] = await Promise.all([
+    client.fetch(categoryQuery, { slug }),
+    client.fetch(articlesQuery, { slug }),
+    client.fetch(totalArticlesInCategoryQuery, { slug })
+  ]);
+
+  return { category, articles, totalArticles };
 }
 
-
-// --- 2. The Page Component ---
 export default async function CategoryPage({ params, searchParams }) {
   const categorySlug = params.slug;
   const currentPage = parseInt(searchParams?.page) || 1;
@@ -97,11 +84,12 @@ export default async function CategoryPage({ params, searchParams }) {
         </section>
       ) : (
         <p className="text-gray-500 dark:text-gray-400 py-8 text-center text-lg">
-          There are no articles in the "{category.title}" category yet.
+          {/* --- THIS IS THE CORRECTED LINE --- */}
+          There are no articles in the ‘{category.title}’ category yet.
         </p>
       )}
 
-      {/* Pagination Controls - Comments removed from disabled spans */}
+      {/* Pagination Controls */}
       {totalArticles > ARTICLES_PER_PAGE && (
         <nav aria-label={`${category.title} articles pagination`} className="flex justify-center items-center space-x-3 sm:space-x-4 mt-10 mb-4">
           {currentPage > 1 ? (
@@ -132,22 +120,9 @@ export default async function CategoryPage({ params, searchParams }) {
   );
 }
 
-// --- 3. Function to generate static paths (Optional, for SSG) ---
 export async function generateStaticParams() {
-  const query = `*[_type == "category" && defined(slug.current) && !(_id in path("drafts.**"))]{ "slug": slug.current }`;
-  const categories = await client.fetch(query); 
-  
-  if (!Array.isArray(categories)) {
-    console.error("generateStaticParams: Sanity did not return an array for categories", categories);
-    return [];
-  }
-
-  return categories
-    .filter(category => category && typeof category.slug === 'string')
-    .map((category) => ({
-      slug: category.slug,
-    }));
+  const categories = await client.fetch(`*[_type == "category" && defined(slug.current)]{ "slug": slug.current }`);
+  return categories.map((category) => ({
+    slug: category.slug,
+  }));
 }
-
-// --- 4. Optional: Revalidate data periodically for SSG/ISR ---
-export const revalidate = 3600; // Revalidate every hour
