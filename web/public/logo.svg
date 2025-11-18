@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <!-- 3x3 Dot Grid -->
+  <circle cx="150" cy="300" r="30" fill="#000000"/>
+  <circle cx="150" cy="200" r="30" fill="#000000"/>
+  <circle cx="150" cy="400" r="30" fill="#000000"/>
+  
+  <circle cx="250" cy="300" r="30" fill="#000000"/>
+  <circle cx="250" cy="200" r="30" fill="#000000"/>
+  <circle cx="250" cy="400" r="30" fill="#000000"/>
+  
+  <circle cx="350" cy="300" r="30" fill="#000000"/>
+  <circle cx="350" cy="200" r="30" fill="#000000"/>
+  <circle cx="350" cy="400" r="30" fill="#000000"/>
+  
+  <!-- Text: THE TREND REPORT -->
+  <text x="420" y="230" font-family="Arial, sans-serif" font-weight="bold" font-size="60" fill="#000000">THE</text>
+  <text x="420" y="320" font-family="Arial, sans-serif" font-weight="bold" font-size="60" fill="#000000">TREND</text>
+  <text x="420" y="410" font-family="Arial, sans-serif" font-weight="bold" font-size="60" fill="#000000">REPORT</text>
+</svg>

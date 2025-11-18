@@ -1,7 +1,5 @@
-// web/src/app/layout.js
-
-import { Geist } from "next/font/google";
-import { Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -17,23 +15,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "The Trend Report",
+  title: {
+    template: '%s | The Trend Report',
+    default: 'The Trend Report',
+  },
   description: "Your source for the latest trends in tech, culture, and more.",
+  openGraph: {
+    title: 'The Trend Report',
+    description: 'Your source for the latest trends in tech, culture, and more.',
+    url: 'https://thetrendreport.com',
+    siteName: 'The Trend Report',
+    locale: 'en_US',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
-    
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      {/* NO WHITESPACE OR COMMENTS BETWEEN <html> AND <body> THAT COULD BECOME TEXT NODES */}
-      <body
-        className={`antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex flex-col min-h-screen`}
-      >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} scroll-smooth`}>
+      <body className="antialiased min-h-screen flex flex-col selection:bg-blue-100 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-100">
         <Header />
-        <main className="flex-grow container mx-auto px-4 sm:px-6 py-8 w-full">
+        <main className="flex-grow w-full">
           {children}
         </main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );

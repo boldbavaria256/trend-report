@@ -1,20 +1,15 @@
-// web/src/app/page.js
-
 import { client, urlFor } from '@/sanity/client';
 import Image from 'next/image';
 import Link from 'next/link';
-import ArticleCard from '@/components/ArticleCard'; // Ensure this component is created and styled
+import ArticleCard from '@/components/ArticleCard';
 
-// --- CONFIGURATION ---
-const ARTICLES_PER_PAGE = 20; // Number of articles to display per page in the "Latest Articles" list
-
-// --- DATA FETCHING FUNCTIONS ---
+const ARTICLES_PER_PAGE = 12;
 
 async function getHomepageSettings() {
   const query = `*[_type == "homepageSettings" && _id == "homepageSettings"][0] {
     _id,
     title,
-    heroArticle->{ // Expand the heroArticle reference
+    heroArticle->{
       _id,
       title,
       "slug": slug.current,
@@ -24,22 +19,19 @@ async function getHomepageSettings() {
       },
       excerpt,
       publishedAt,
-      categories[]->{ // Expand categories for the hero article
+      categories[]->{
         _id,
         title,
         "slug": slug.current
       }
     }
   }`;
-  const settings = await client.fetch(query);
-  return settings;
+  return await client.fetch(query);
 }
 
 async function getPaginatedArticles(page = 1) {
   const startIndex = (page - 1) * ARTICLES_PER_PAGE;
-  // Sanity's slicing is exclusive for the end index, so to get ARTICLES_PER_PAGE items:
-  // e.g., page 1: [0...20] gives items 0-19. page 2: [20...40] gives items 20-39.
-  const endIndex = startIndex + ARTICLES_PER_PAGE; 
+  const endIndex = startIndex + ARTICLES_PER_PAGE;
 
   const articlesQuery = `*[_type == "article"] | order(publishedAt desc) [${startIndex}...${endIndex}] {
     _id,
@@ -51,7 +43,7 @@ async function getPaginatedArticles(page = 1) {
     },
     excerpt,
     publishedAt,
-    categories[]->{ // Expand categories for each article in the list
+    categories[]->{
         _id,
         title
     }
@@ -59,21 +51,17 @@ async function getPaginatedArticles(page = 1) {
 
   const totalCountQuery = `count(*[_type == "article"])`;
 
-  // Fetch articles for the current page and the total count in parallel
   const [articles, totalArticles] = await Promise.all([
     client.fetch(articlesQuery),
     client.fetch(totalCountQuery)
   ]);
-  
+
   return { articles, totalArticles };
 }
 
-// --- PAGE COMPONENT ---
 export default async function HomePage({ searchParams }) {
-  // Determine the current page from URL search parameters, default to 1
   const currentPage = parseInt(searchParams?.page) || 1;
 
-  // Fetch all necessary data in parallel
   const [settings, { articles: paginatedArticles, totalArticles }] = await Promise.all([
     getHomepageSettings(),
     getPaginatedArticles(currentPage)
@@ -82,133 +70,112 @@ export default async function HomePage({ searchParams }) {
   const heroArticle = settings?.heroArticle;
   const totalPages = Math.ceil(totalArticles / ARTICLES_PER_PAGE);
 
-  // Common button styling
-  const buttonBaseStyle = "px-4 py-2 rounded-md transition-colors text-sm font-medium";
-  const primaryButtonStyle = `${buttonBaseStyle} bg-blue-600 text-white hover:bg-blue-700`;
-  const secondaryButtonStyle = `${buttonBaseStyle} bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600`;
-  const disabledButtonStyle = `${buttonBaseStyle} bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed`;
-
-
   return (
-    // Main container for the page content
-    <main className="flex min-h-screen flex-col items-center p-4 md:p-8 lg:p-12">
-      <div className="w-full max-w-7xl space-y-12 md:space-y-16"> {/* Added space-y for vertical spacing between sections */}
-        
-        {/* Optional: Welcome Title */}
-        {/* <h1 className="text-3xl md:text-4xl font-bold text-center">
-          Welcome to The Trend Report!
-        </h1> */}
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
+      {heroArticle && (
+        <section className="relative w-full h-[70vh] min-h-[500px] flex items-end justify-start overflow-hidden">
+          {/* Background Image with Overlay */}
+          <div className="absolute inset-0 z-0">
+            {heroArticle.mainImage?.asset && (
+              <Image
+                src={urlFor(heroArticle.mainImage).width(1920).height(1080).fit('crop').url()}
+                alt={heroArticle.mainImage.alt || heroArticle.title}
+                fill
+                priority
+                className="object-cover"
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+          </div>
 
-        {/* Hero Article Section */}
-        {heroArticle ? (
-          <section aria-labelledby="hero-article-heading">
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 p-4 md:p-6 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-              {/* Image Column */}
-              {heroArticle.mainImage && heroArticle.mainImage.asset && (
-                <div className="w-full md:w-2/5 lg:w-1/2 flex-shrink-0">
-                  <Link href={`/articles/${heroArticle.slug}`} className="block aspect-[4/3] md:aspect-[16/9] relative w-full overflow-hidden rounded-md group">
-                    <Image
-                      src={urlFor(heroArticle.mainImage).width(800).fit('crop').auto('format').url()}
-                      alt={heroArticle.mainImage.alt || heroArticle.title || 'Hero article image'}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300 ease-in-out"
-                      priority
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
-                    />
-                  </Link>
-                </div>
+          {/* Hero Content */}
+          <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-24">
+            <div className="max-w-3xl space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
+              {heroArticle.categories?.[0] && (
+                <span className="inline-block px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold tracking-wider uppercase mb-2">
+                  {heroArticle.categories[0].title}
+                </span>
               )}
-              {/* Text Content Column */}
-              <div className="w-full md:w-3/5 lg:w-1/2 flex flex-col justify-center py-2"> {/* Added py-2 for some vertical padding */}
-                <h2 id="hero-article-heading" className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 leading-tight">
-                  <Link href={`/articles/${heroArticle.slug}`} className="hover:text-blue-600 dark:hover:text-blue-400">
-                    {heroArticle.title || 'Featured Article'}
-                  </Link>
-                </h2>
-                
-                {heroArticle.excerpt && (
-                  <p className="text-gray-700 dark:text-gray-300 mb-4 text-base md:text-lg leading-relaxed"> {/* Added leading-relaxed */}
-                    {heroArticle.excerpt}
-                  </p>
-                )}
 
-                <div className="text-sm text-gray-500 dark:text-gray-400 mb-6 space-y-1"> {/* Increased mb */}
-                  {heroArticle.categories && heroArticle.categories.length > 0 && (
-                    <div className="flex flex-wrap gap-x-2 gap-y-1">
-                      {heroArticle.categories.map((category) => (
-                        <Link key={category._id} href={`/categories/${category.slug}`} className="font-medium hover:underline">
-                          {category.title}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                  {heroArticle.publishedAt && (
-                    <p>
-                       {new Date(heroArticle.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                    </p>
-                  )}
-                </div>
-                
-                {heroArticle.slug && (
-                  <Link href={`/articles/${heroArticle.slug}`} className={`${primaryButtonStyle} self-start md:self-auto max-w-xs text-center`}> {/* Applied primary button style, text-center for mobile */}
-                    Read More
-                  </Link>
-                )}
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight text-balance drop-shadow-lg">
+                <Link href={`/articles/${heroArticle.slug}`} className="hover:text-blue-200 transition-colors">
+                  {heroArticle.title}
+                </Link>
+              </h1>
+
+              {heroArticle.excerpt && (
+                <p className="text-lg md:text-xl text-gray-200 line-clamp-2 max-w-2xl">
+                  {heroArticle.excerpt}
+                </p>
+              )}
+
+              <div className="pt-4">
+                <Link
+                  href={`/articles/${heroArticle.slug}`}
+                  className="inline-flex items-center px-6 py-3 rounded-full bg-white text-black font-semibold hover:bg-gray-100 transition-colors"
+                >
+                  Read Full Story
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
               </div>
             </div>
-          </section>
+          </div>
+        </section>
+      )}
+
+      {/* Latest Articles Section */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+        <div className="flex items-center justify-between mb-12">
+          <h2 className="text-3xl font-bold tracking-tight">Latest Stories</h2>
+          <div className="h-px flex-grow bg-border ml-8 hidden sm:block"></div>
+        </div>
+
+        {paginatedArticles?.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+            {paginatedArticles.map((article) => (
+              <ArticleCard key={article._id} article={article} />
+            ))}
+          </div>
         ) : (
-          // Placeholder if no hero article is selected
-          <div className="text-center py-10 text-gray-500">
-            <p>No featured article at the moment. Check out our latest articles below!</p>
+          <div className="text-center py-20 bg-muted/30 rounded-lg border border-dashed border-border">
+            <p className="text-muted-foreground">No articles found.</p>
           </div>
         )}
 
-        {/* Paginated "Latest Articles" Section */}
-        <section aria-labelledby="latest-articles-heading">
-          <h2 id="latest-articles-heading" className="text-2xl md:text-3xl font-semibold mb-6 md:mb-8 border-b pb-3"> {/* Adjusted margins and padding */}
-            Latest Articles 
-            {totalArticles > 0 && <span className="text-base font-normal text-gray-500"> </span>}
-          </h2>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-16 gap-2">
+            <Link
+              href={currentPage > 2 ? `/?page=${currentPage - 1}` : '/'}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPage === 1
+                ? 'text-muted-foreground cursor-not-allowed'
+                : 'hover:bg-muted text-foreground'
+                }`}
+              aria-disabled={currentPage === 1}
+            >
+              Previous
+            </Link>
 
-          {paginatedArticles && paginatedArticles.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-8"> {/* Adjusted sm breakpoint and gaps */}
-              {paginatedArticles.map((article) => (
-                <ArticleCard key={article._id} article={article} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 py-8 text-center">
-              {currentPage > 1 ? 'No more articles found for this page.' : 'No articles published yet. Check back soon!'}
-            </p>
-          )}
+            <span className="px-4 py-2 text-sm font-medium text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </span>
 
-          {/* Pagination Controls */}
-          {totalArticles > ARTICLES_PER_PAGE && (
-            <nav aria-label="Article list pagination" className="flex justify-center items-center space-x-3 sm:space-x-4 mt-10 mb-12">
-              {currentPage > 1 ? (
-                <Link href={currentPage === 2 ? `/` : `/?page=${currentPage - 1}`} className={secondaryButtonStyle}>
-                  ← Previous
-                </Link>
-              ) : (
-                <span className={disabledButtonStyle}>← Previous</span>
-              )}
-
-              <span className="text-gray-700 dark:text-gray-300 text-sm">
-                Page {currentPage} of {totalPages}
-              </span>
-
-              {currentPage < totalPages ? (
-                <Link href={`/?page=${currentPage + 1}`} className={secondaryButtonStyle}>
-                  Next →
-                </Link>
-              ) : (
-                <span className={disabledButtonStyle}>Next →</span>
-              )}
-            </nav>
-          )}
-        </section>
-      </div>
-    </main>
+            <Link
+              href={`/?page=${currentPage + 1}`}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPage >= totalPages
+                ? 'text-muted-foreground cursor-not-allowed'
+                : 'hover:bg-muted text-foreground'
+                }`}
+              aria-disabled={currentPage >= totalPages}
+            >
+              Next
+            </Link>
+          </div>
+        )}
+      </section>
+    </div>
   );
 }

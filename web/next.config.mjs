@@ -1,20 +1,27 @@
+import withPWAInit from "@ducanh2912/next-pwa";
+
+const withPWA = withPWAInit({
+  dest: "public",
+  cacheOnFrontEndNav: true,
+  aggressiveFrontEndNavCaching: true,
+  reloadOnOnline: true,
+  swcMinify: true,
+  disable: process.env.NODE_ENV === "development",
+  workboxOptions: {
+    disableDevLogs: true,
+  },
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-        remotePatterns: [
-          {
-            protocol: 'https',
-            hostname: 'cdn.sanity.io',
-            port: '', // Keep empty for default port (443 for https)
-            pathname: '/**', // Allow any path under this hostname
-          },
-          // You can add other trusted hostnames here if needed in the future
-          // {
-          //   protocol: 'https',
-          //   hostname: 'another-trusted-domain.com',
-          // },
-        ],
-    },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',
+      },
+    ],
+  },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);
