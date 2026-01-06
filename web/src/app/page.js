@@ -74,8 +74,8 @@ export default async function HomePage({ searchParams }) {
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       {heroArticle && (
-        <section className="relative w-full h-[70vh] min-h-[500px] flex items-end justify-start overflow-hidden">
-          {/* Background Image with Overlay */}
+        <section className="relative w-full h-[85dvh] min-h-[600px] flex items-center justify-start overflow-hidden">
+          {/* Background Image with Neutral Depth Overlay */}
           <div className="absolute inset-0 z-0">
             {heroArticle.mainImage?.asset && (
               <Image
@@ -86,38 +86,25 @@ export default async function HomePage({ searchParams }) {
                 className="object-cover"
               />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+            <div className="absolute inset-0 bg-black/40 lg:bg-transparent" />
           </div>
 
-          {/* Hero Content */}
-          <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-24">
-            <div className="max-w-3xl space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
-              {heroArticle.categories?.[0] && (
-                <span className="inline-block px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold tracking-wider uppercase mb-2">
-                  {heroArticle.categories[0].title}
-                </span>
-              )}
-
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight text-balance drop-shadow-lg">
-                <Link href={`/articles/${heroArticle.slug}`} className="hover:text-blue-200 transition-colors">
-                  {heroArticle.title}
-                </Link>
+          {/* Floating Hero Content Card */}
+          <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl glass p-6 sm:p-10 md:p-14 rounded-[2rem] sm:rounded-[3rem] space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-12 duration-1000 ease-out">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter leading-[1.1] md:leading-[1.05] text-balance">
+                {heroArticle.title}
               </h1>
-
-              {heroArticle.excerpt && (
-                <p className="text-lg md:text-xl text-gray-200 line-clamp-2 max-w-2xl">
-                  {heroArticle.excerpt}
-                </p>
-              )}
 
               <div className="pt-4">
                 <Link
                   href={`/articles/${heroArticle.slug}`}
-                  className="inline-flex items-center px-6 py-3 rounded-full bg-white text-black font-semibold hover:bg-gray-100 transition-colors"
+                  className="inline-flex items-center px-10 py-5 rounded-full bg-accent text-accent-foreground text-xs font-bold uppercase tracking-widest hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 active:scale-95"
                 >
                   Read Full Story
-                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  <svg className="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
                 </Link>
               </div>

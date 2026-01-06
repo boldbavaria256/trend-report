@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { client } from '@/sanity/client';
 import CategoriesDropdown from './CategoriesDropdown';
 import MobileMenu from './MobileMenu';
+import ThemeToggle from './ThemeToggle';
 
 async function getCategories() {
   const query = `*[_type == "category"] | order(title asc) {
@@ -12,6 +13,8 @@ async function getCategories() {
   }`;
   return await client.fetch(query);
 }
+
+import NotificationManager from './NotificationManager';
 
 export default async function Header() {
   const categories = await getCategories();
@@ -39,8 +42,9 @@ export default async function Header() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Placeholder for future search or theme toggle */}
+        <div className="flex items-center gap-2">
+          <NotificationManager />
+          <ThemeToggle />
           <MobileMenu categories={categories} />
         </div>
       </div>

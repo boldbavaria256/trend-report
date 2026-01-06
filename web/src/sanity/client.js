@@ -1,6 +1,6 @@
 // web/src/sanity/client.js
 
-import {createClient} from '@sanity/client'
+import { createClient } from '@sanity/client'
 // Import imageUrlBuilder if you're using @next-sanity/image or a similar library
 import imageUrlBuilder from '@sanity/image-url'
 
@@ -19,7 +19,7 @@ export const client = createClient({
   dataset,
   apiVersion, // https://www.sanity.io/docs/api-versioning
   useCdn: process.env.NODE_ENV === 'production', // Use CDN in production for faster responses
-  // token: process.env.SANITY_API_TOKEN, // Only if you need to write data or fetch private datasets
+  token: process.env.SANITY_API_TOKEN, // Only if you need to write data or fetch private datasets
   // perspective: 'published', // Or 'raw' or 'previewDrafts'
 })
 

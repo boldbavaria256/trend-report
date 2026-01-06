@@ -58,7 +58,7 @@ async function getArticleAndRelated(slug, maxRelated = 3) {
         categoryIds: article.categoryIds,
       });
     }
-    
+
     return { article, relatedArticles: relatedArticles || [] };
 
   } catch (error) {
@@ -70,8 +70,8 @@ async function getArticleAndRelated(slug, maxRelated = 3) {
 
 // --- PORTABLE TEXT COMPONENTS ---
 const portableTextComponents = {
-  types: { 
-    image: ({ value }) => { 
+  types: {
+    image: ({ value }) => {
       if (!value?.asset?._ref && !value?.asset?._id) return null;
       return (
         <figure className="my-6 md:my-8">
@@ -79,7 +79,7 @@ const portableTextComponents = {
             <Image
               src={urlFor(value).fit('max').auto('format').url()}
               alt={value.alt || 'Article content image'}
-              fill 
+              fill
               className="object-contain rounded-md"
               sizes="(max-width: 768px) 100vw, 700px"
             />
@@ -89,24 +89,24 @@ const portableTextComponents = {
       );
     },
   },
-  marks: { 
+  marks: {
     link: ({ children, value }) => {
       const rel = !value.href.startsWith('/') ? 'noreferrer noopener' : undefined;
-      return (<Link href={value.href} rel={rel} className="text-blue-600 hover:underline dark:text-blue-400">{children}</Link>);
+      return (<Link href={value.href} rel={rel} className="underline decoration-foreground/20 hover:decoration-foreground transition-all">{children}</Link>);
     },
   },
-  block: { 
+  block: {
     h2: ({ children }) => <h2 className="text-2xl sm:text-3xl font-semibold mt-8 mb-4 md:mt-10 md:mb-5">{children}</h2>,
     h3: ({ children }) => <h3 className="text-xl sm:text-2xl font-semibold mt-7 mb-3 md:mt-8 md:mb-4">{children}</h3>,
     h4: ({ children }) => <h4 className="text-lg sm:text-xl font-semibold mt-6 mb-3 md:mt-7 md:mb-4">{children}</h4>,
     blockquote: ({ children }) => (<blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 pr-2 py-3 italic my-6 md:my-8 text-gray-700 dark:text-gray-300 rounded-r-md">{children}</blockquote>),
     normal: ({ children }) => <p className="mb-5 md:mb-6 leading-relaxed">{children}</p>,
   },
-  list: { 
+  list: {
     bullet: ({ children }) => <ul className="list-disc pl-6 md:pl-8 my-5 md:my-6 space-y-2">{children}</ul>,
     number: ({ children }) => <ol className="list-decimal pl-6 md:pl-8 my-5 md:my-6 space-y-2">{children}</ol>, // <--- CORRECTED TAG
   },
-  listItem: { 
+  listItem: {
     bullet: ({ children }) => <li>{children}</li>,
     number: ({ children }) => <li>{children}</li>,
   },
@@ -123,7 +123,7 @@ export default async function ArticlePage({ params }) {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 sm:py-12">
       <article className="max-w-3xl mx-auto">
-        
+
         <header className="mb-6 md:mb-8">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 md:mb-4 leading-tight text-slate-900 dark:text-white">
             {article.title}
@@ -131,18 +131,18 @@ export default async function ArticlePage({ params }) {
           <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2 mt-4">
             {article.publishedAt && (
               <p>
-                {new Date(article.publishedAt).toLocaleDateString('en-US', { 
-                  month: 'long', day: 'numeric', year: 'numeric' 
+                {new Date(article.publishedAt).toLocaleDateString('en-US', {
+                  month: 'long', day: 'numeric', year: 'numeric'
                 })}
               </p>
             )}
             {article.categories && article.categories.length > 0 && (
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
                 {article.categories.map((category) => (
-                  <Link 
-                    key={category._id} 
-                    href={`/categories/${category.slug}`} 
-                    className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
+                  <Link
+                    key={category._id}
+                    href={`/categories/${category.slug}`}
+                    className="text-foreground hover:underline font-semibold"
                   >
                     {category.title}
                   </Link>
@@ -154,12 +154,12 @@ export default async function ArticlePage({ params }) {
 
         {article.mainImage && article.mainImage.asset && (
           <div className="my-6 md:my-8 relative aspect-[16/9] w-full overflow-hidden rounded-lg shadow-md">
-             <Image 
-              src={urlFor(article.mainImage).width(1000).fit('crop').auto('format').url()} 
-              alt={article.mainImage.alt || article.title || 'Article main image'} 
-              fill 
-              className="object-cover" 
-              priority 
+            <Image
+              src={urlFor(article.mainImage).width(1000).fit('crop').auto('format').url()}
+              alt={article.mainImage.alt || article.title || 'Article main image'}
+              fill
+              className="object-cover"
+              priority
             />
           </div>
         )}
@@ -204,7 +204,7 @@ export async function generateStaticParams() {
     console.error("Error fetching articles for generateStaticParams:", error);
     return [];
   }
-  
+
   return articles
     .filter(article => article && typeof article.slug === 'string')
     .map((article) => ({

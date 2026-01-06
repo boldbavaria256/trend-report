@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { X } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 import Link from 'next/link';
 
 export default function MobileMenu({ categories }) {
@@ -48,11 +50,19 @@ export default function MobileMenu({ categories }) {
                     }`}
             >
                 <div className="flex flex-col h-full p-6 overflow-y-auto">
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center justify-between p-4 border-b border-border">
                         <span className="text-lg font-bold">Menu</span>
-                        {/* Close button is handled by the toggle button above which is z-50 */}
+                        <div className="flex items-center gap-2">
+                            <ThemeToggle />
+                            <button
+                                onClick={() => setIsOpen(false)}
+                                className="p-2 rounded-full hover:bg-muted transition-colors"
+                                aria-label="Close menu"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
                     </div>
-
                     <nav className="flex flex-col space-y-6">
                         <Link
                             href="/"
