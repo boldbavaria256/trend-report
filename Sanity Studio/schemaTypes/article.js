@@ -73,7 +73,11 @@ export default {
       name: 'markdownBody',
       title: 'Body (Markdown)',
       type: 'markdown',
-      description: 'Write using Markdown for easy formatting control.',
+      description: 'Write using Markdown. Click the "Eye" icon in the toolbar to see a live preview.',
+      options: {
+        imageUrl: (imageAsset) => imageAsset.url, // Enable image uploads
+        minHeight: '500px',
+      },
     },
     {
       name: 'body',
