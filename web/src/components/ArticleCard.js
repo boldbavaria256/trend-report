@@ -8,7 +8,7 @@ export default function ArticleCard({ article }) {
   return (
     <Link
       href={`/articles/${article.slug?.current || article.slug}`}
-      className="group flex flex-col h-full floating-card rounded-2xl overflow-hidden"
+      className="group flex flex-col h-full floating-card rounded-2xl overflow-hidden bg-card"
     >
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
         {article.mainImage?.asset ? (
@@ -24,12 +24,13 @@ export default function ArticleCard({ article }) {
             <span className="text-xs font-semibold uppercase tracking-widest">Image Unavailable</span>
           </div>
         )}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
       </div>
 
-      <div className="flex flex-col flex-grow p-6 sm:p-8">
-        <div className="flex items-center justify-between mb-5">
+      <div className="flex flex-col flex-grow p-8">
+        <div className="flex items-center justify-between mb-6">
           {article.categories && article.categories.length > 0 && (
-            <span className="text-[10px] font-extrabold tracking-[0.2em] uppercase opacity-70">
+            <span className="text-[10px] font-black tracking-[0.2em] uppercase text-foreground/60">
               {article.categories[0].title}
             </span>
           )}
@@ -38,7 +39,7 @@ export default function ArticleCard({ article }) {
           </span>
         </div>
 
-        <h3 className="text-2xl font-bold leading-[1.2] mb-4 tracking-tight group-hover:text-accent transition-colors">
+        <h3 className="text-2xl font-bold leading-tight mb-4 tracking-tight group-hover:text-foreground/80 transition-colors">
           {article.title || 'Untitled Article'}
         </h3>
 
@@ -46,9 +47,9 @@ export default function ArticleCard({ article }) {
           {article.excerpt}
         </p>
 
-        <div className="flex items-center text-[10px] font-black uppercase tracking-[0.25em] mt-auto">
-          <span className="border-b-[2px] border-accent pb-1 group-hover:pr-4 transition-all">Read Record</span>
-          <svg className="w-4 h-4 ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center text-[10px] font-black uppercase tracking-[0.25em] mt-auto text-foreground">
+          <span className="border-b-2 border-foreground pb-1 group-hover:pr-4 transition-all">Read Record</span>
+          <svg className="w-3 h-3 ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
         </div>

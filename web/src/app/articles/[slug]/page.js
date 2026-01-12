@@ -3,6 +3,8 @@
 import { client, urlFor } from '@/sanity/client';
 import Image from 'next/image';
 import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { PortableText } from '@portabletext/react';
 import { notFound } from 'next/navigation';
 import ArticleCard from '@/components/ArticleCard'; // For related articles
@@ -18,7 +20,9 @@ async function getArticleAndRelated(slug, maxRelated = 3) {
       alt
     },
     publishedAt,
+    publishedAt,
     body,
+    markdownBody,
     "categoryIds": categories[]._ref 
   }`;
 
@@ -164,9 +168,15 @@ export default async function ArticlePage({ params }) {
           </div>
         )}
 
-        {article.body ? (
+        {article.markdownBody || article.body ? (
           <div className="prose prose-lg dark:prose-invert max-w-none py-4 md:py-6 text-gray-800 dark:text-gray-200 leading-relaxed">
-            <PortableText value={article.body} components={portableTextComponents} />
+            {article.markdownBody ? (
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {article.markdownBody}
+              </ReactMarkdown>
+            ) : (
+              <PortableText value={article.body} components={portableTextComponents} />
+            )}
           </div>
         ) : (
           <p className="py-8 text-center text-gray-500">Article content not found.</p>

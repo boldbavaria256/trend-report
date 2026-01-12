@@ -3,6 +3,7 @@ import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
 import { media } from 'sanity-plugin-media'
 import { Iframe } from 'sanity-plugin-iframe-pane'
+import { markdownSchema } from 'sanity-plugin-markdown'
 import { schemaTypes } from './schemaTypes'
 
 // Define our custom desk structure
@@ -56,7 +57,10 @@ export default defineConfig({
               .component(Iframe)
               .options({
                 // Dynamic URL for articles
-                url: (doc) => `http://localhost:3000/articles/${doc?.slug?.current}`,
+                url: (doc) => {
+                  if (!doc?.slug?.current) return null
+                  return `http://localhost:3000/articles/${doc.slug.current}`
+                },
                 reload: { button: true },
               })
               .title('Preview'),
@@ -67,6 +71,7 @@ export default defineConfig({
     }),
     visionTool(),
     media(),
+    markdownSchema(),
   ],
 
   schema: {
